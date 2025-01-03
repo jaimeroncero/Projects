@@ -50,8 +50,17 @@ For only applying the loss function to the correct class probability we take the
 ### Optimization method
 For optimizing our model we will use **stochastic gradient descent**, i.e. we choose randomly just one example for computing gradients.
 To compute gradients we are using matrix derivatives with [denominator layout convention](https://introml.mit.edu/_static/fall23/LectureNotes/chapter_Matrix_derivative_common_cases.pdf) (to ensure that the gradient of the loss w.r.t. model's parameters
-keep the same shape.)
+keep the same shape.) For example $(x,y)$:  
 
+- $$\frac{\partial L}{\partial s}$$ is a matrix $C \times 1$. We compute gradient of the loss w.r.t $s$ instead of $h$
+  because this allow us to do some simplifications that increases numerical stability:
+- $$L = \-log(P(Y=y|x)) = -\log(\frac{e^{s_y}}{\sum_j{e^{s_j}}}) = -y + \log(\sum_j{e^{s_j}}) $$
+- $$(\frac{\partial L}{\partial s})_j = \frac{\partial L}{\partial s_j} =
+  \frac{\partial}{\partial s_j}[ -y + \log(\sum_k{e^{s_k}})] =
+  \frac{e^{s_j}}{\sum_k{e^{s_k}}} - \mathbb{1}(y=j)=
+  softmax(s)_j - \mathbb{1}(y=j)
+  \Rightarrow \frac{\partial L}{\partial s} = h_1 - yoh$$
+  
 
 
 
