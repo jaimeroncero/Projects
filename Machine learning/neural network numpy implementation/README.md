@@ -6,6 +6,7 @@ Design of a 2-layer fully connected artificial neural network using numpy.
 - [Loss function](loss_function)
 - [Optimization method](optimization_method)
 - [Modules](modules)
+- [Final result](final_result)
 
 
 ### Model architecture
@@ -107,3 +108,11 @@ $$\frac{\partial L}{\partial b_0} = \frac{\partial L}{\partial s_1} \cdot \frac{
 | Data | Contains functions to generate sample data, display results and evaluate model's performance. |
 | fcann2 | Implementation and training of the neural network using SGD. |
 | pt_deep | Equivalent implementation using PyTorch to compare performance. |
+
+
+
+### Final result
+
+Data whose true label is 0 appears in white, 1 in grey. Model's predicted 0 region is yellow and 1 region is purple. Misclassified data points are those square shaped.
+![image](https://github.com/user-attachments/assets/6e5c0090-0d96-425e-b452-a4cc348dcf9a)
+
