@@ -52,16 +52,58 @@ For optimizing our model we will use **stochastic gradient descent**, i.e. we ch
 To compute gradients we are using matrix derivatives with [denominator layout convention](https://introml.mit.edu/_static/fall23/LectureNotes/chapter_Matrix_derivative_common_cases.pdf) (to ensure that the gradient of the loss w.r.t. model's parameters
 keep the same shape.) For example $(x,y)$:  
 
+
 - $$\frac{\partial L}{\partial s}$$ is a matrix $C \times 1$. We compute gradient of the loss w.r.t $s$ instead of $h$
-  because this allow us to do some simplifications that increases numerical stability:
-- $$L = \-log(P(Y=y|x)) = -\log(\frac{e^{s_y}}{\sum_j{e^{s_j}}}) = -y + \log(\sum_j{e^{s_j}}) $$
-- $$(\frac{\partial L}{\partial s})_j = \frac{\partial L}{\partial s_j} =
+  because this allow us to do some simplifications that increases numerical stability:  
+  
+ $$L = \-log(P(Y=y|x)) = -\log(\frac{e^{s_y}}{\sum_j{e^{s_j}}}) = -y + \log(\sum_j{e^{s_j}}) $$  
+  
+ $$(\frac{\partial L}{\partial s})_j = \frac{\partial L}{\partial s_j} =
   \frac{\partial}{\partial s_j}[ -y + \log(\sum_k{e^{s_k}})] =
-  \frac{e^{s_j}}{\sum_k{e^{s_k}}} - \mathbb{1}(y=j)=
-  softmax(s)_j - \mathbb{1}(y=j)
-  \Rightarrow \frac{\partial L}{\partial s} = h_1 - yoh$$
+  \frac{e^{s_j}}{\sum_k{e^{s_k}}} - \mathbb{1}\[y=j\]=
+  softmax(s)_j - \mathbb{1}\[y=j\]
+  \Rightarrow \frac{\partial L}{\partial s} = h_1 - yoh$$  
+  
+- The gradient $$\frac{\partial s}{\partial W}$$ is formally a 3D tensor:
+    
+ $$\frac{\partial  s}{\partial W_{i,j}} = (\cdots \frac{\partial s_k}{\partial W_{i,j}} \cdots )$$
+
+ $$\frac{\partial s_k}{\partial W_{i,j}} = \frac{\partial}{\partial W_{i,j}}\[W_k \cdot h + b_k \] = \frac{\partial}{\partial W_{i,j}}\[\sum_{z}    W_{k,z} \cdot h_z \] = h_j \space \text{if  (i,j) = (k,z)}$$  
+
+ $\frac{\partial s}{\partial W_{i,j}}$ is a vector whose i-th element is $h_j$ and zero elsewhere. We can flatten this out into the scalar $h_j$. Now $\frac{\partial s}{\partial W}$ is a matrix whose elements in j-th column are $h_j$. Stacking this we obtain:  
+
+ $$\frac{\partial s}{\partial W} = h^T$$  
+
+ - $\frac{\partial s}{\partial b}$ is a square matrix:
+
+$$\frac{\partial s_j}{\partial b_i} = 1 \space \space \text{if i = j} \space \space \Rightarrow \frac{\partial s}{\partial b} = I$$  
+
+- $\frac{\partial s}{\partial h}$ is a matrix $len(h) \times len(s)$:
+
+$$\frac{\partial s_j}{\partial h_i} = \frac{\partial}{\partial h_i}W_j \cdot h = W_{j,i} \space \Rightarrow \space \space \frac{\partial s}{\partial b} = W^T$$  
+
+- If $h = ReLU(s) = max(s,0)$ then $\frac{\partial h}{\partial s}$ is a square matrix. As ReLU function is applied element-wise this matrix will have zeros outside the diagonal. Diagonal's i-th element will be 1 if $s_i > 0$ or $0$ otherwise:
+
+$$\frac{\partial ReLU(s)}{\partial s} = diag(1\[s > 0\])$$  
+
+Now we can compute all the remaining gradients through backpropagation:  
+
+$$\frac{\partial L}{\partial W_1} = \frac{\partial L}{\partial s_1} \cdot \frac{\partial s_1}{\partial W_1}$$  
+
+$$\frac{\partial L}{\partial b_1} = \frac{\partial L}{\partial s_1} \cdot \frac{\partial s_1}{\partial b_1}$$    
+
+$$\frac{\partial L}{\partial W_0} = \frac{\partial L}{\partial s_1} \cdot \frac{\partial s_1}{\partial h_0}
+\cdot \frac{\partial h_0}{\partial s_0} \cdot \frac{\partial s_0}{\partial W_0}$$    
+
+$$\frac{\partial L}{\partial b_0} = \frac{\partial L}{\partial s_1} \cdot \frac{\partial s_1}{\partial h_0}
+\cdot \frac{\partial h_0}{\partial s_0} \cdot \frac{\partial s_0}{\partial b_0}$$ 
   
 
 
 
 ### Modules
+|   |   |
+|:--------|:-----------------|
+| Data | Contains functions to generate sample data, display results and evaluate model's performance. |
+| fcann2 | Implementation and training of the neural network using SGD. |
+| pt_deep | Equivalent implementation using PyTorch to compare performance. |
