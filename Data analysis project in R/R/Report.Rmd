@@ -1,0 +1,408 @@
+---
+output:
+  html_document: default
+---
+
+<div style="text-align: center; margin-top: 100px;">
+  <h1>Project assignment. Statistical programming fundamentals.</h1>
+  <h2>Jaime Rodriguez Roncero</h2>
+  <h3>`r Sys.Date()`</h3>
+</div>
+
+<hr style="border: 1px solid black;">
+
+
+In this analysis, we explored a dataset of reported UFO sightings, applying data cleaning, transformation, and visualization techniques to uncover key patterns. We examined the distribution of sightings across countries, analyzed trends over time and identified the most frequently reported UFO shapes.
+
+```{r image-plot, echo=FALSE, fig.align='center', out.width='50%'}
+knitr::include_graphics("../figures/img_UFO.jpeg")
+```
+
+<div style="page-break-before: always;"></div>
+
+# 1. Data Preparation
+
+## 1.1. Data import
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(sf)
+```
+
+Loading our dataset.
+
+```{r, warning=FALSE, message=FALSE}
+rm(list=ls())
+df <- read_csv("../data/01_initial_dataset.csv")
+```
+
+## 1.2. Initial exploration.
+
+View data structure.
+
+```{r}
+head(df)
+glimpse(df)
+```
+We see that each row correspond to a different UFO sighting and contains 11 columns with information about it (country, time,...)
+
+## 1.3 Data cleaning.
+
+Lets start by removing the following columns:
+
+- *duration (hours/min).* It has irrelevant information having *duration (seconds)* column and it has inconsistent data format (1/2 hour,    1-2 hours, 20 seconds).   
+- *date posted.* Does not contain relevant data for the analysis we will perform.  
+- *city.* It is very specific (for the same city each row has different annotations). We will use latitude and longitude if we need this     kind of data.  
+
+```{r}
+df$`duration (hours/min)` <- NULL
+df$`date posted` <- NULL
+df$city <- NULL
+```
+
+Transform column's data types to something more suitable for them:
+
+```{r, warning=F}
+df$datetime <- as.POSIXct(df$datetime, format = "%m/%d/%Y %H:%M")
+df$state <- as.factor(df$state)
+df$country <- as.factor(df$country)
+df$shape <- as.factor(df$shape)
+df$longitude <- as.numeric(df$longitude)
+df$latitude <- as.numeric(df$latitude)
+
+df %>% rename(duration = `duration (seconds)`) -> df
+```
+
+Look at summary statistics to catch any anomalies (e.g., impossible durations, NA's, etc.).
+
+
+```{r}
+summary(df)
+```
+We note the following things:  
+
+- Max of *datatime* column is 2014-05-08. This means data acquisition stop before finishing last year.  
+- Values for latitude and longitude are withing the allowed range ([-90,90] and [-180,180]).
+- State and country columns have a large number of NA's. We will allow this because there are levels for only 5 countries and state field    for no U.S. countries must be blank.  
+- We have outliers in duration column.
+
+
+First lets remove all the rows containing NA's that are not in state and country columns (We have 88 thousand rows and the rows removed are a few hundreds, so we can take this.)
+
+```{r}
+df <- df %>% filter( if_all( .cols = -c(state, country), ~ !is.na(.) ) )
+```
+
+```{r}
+summary(df)
+```
+
+Now lets handle outliers in duration:
+
+```{r}
+ggplot(df, aes(x = "", y = duration)) +
+  geom_boxplot() +
+  labs(
+    title = "UFO Sighting Duration (Seconds)"
+  ) +
+  theme_minimal()
+```
+
+If we take a look to this outliers, they do not have any type of special information or common pattern, so we will remove them using the 1.5IQR rule.
+
+
+```{r}
+df %>% filter(duration > 2.5e7) %>% print
+```
+
+
+```{r}
+Q1 <- quantile(df$duration, 0.25)
+Q3 <- quantile(df$duration, 0.75)
+IQR_value <- Q3 - Q1
+
+lower_bound <- Q1 - 1.5 * IQR_value
+upper_bound <- Q3 + 1.5 * IQR_value
+
+df <- df %>%
+  filter(duration >= lower_bound, duration <= upper_bound)
+
+ggplot(df, aes(x = "", y = duration)) +
+  geom_boxplot() +
+  labs(
+    title = "UFO Sighting Duration (Seconds)"
+  ) +
+  theme_minimal()
+
+```
+
+We are now ready for analysis.
+
+```{r}
+write_csv(df, "../data/02_cleaned_dataset.csv")
+```
+
+
+
+<div style="page-break-before: always;"></div>
+
+# 2. Geographical analysis: Which locations report the highest number of UFO sightings?
+
+
+
+Lets begin with a general view of sighting spots around the world:
+
+```{r}
+
+world <- ne_countries(scale = "medium", returnclass = "sf")
+
+ggplot() +
+  geom_sf(data = world, fill = "white", color = "black", size = 0.2) +
+  geom_point(
+    data = df, 
+    aes(x = longitude, y = latitude), 
+    color = "red", 
+    alpha = 0.1, 
+    size = 0.5
+  ) +
+  coord_sf() +
+  labs(
+    title = "UFO Sightings Around the World",
+    x = "Longitude",
+    y = "Latitude"
+  ) +
+  theme_minimal()
+```
+   
+We observe that a big part of the data comes from U.S, Europe and Australia while other crowded countries have few reports (Brazil, India, China,...) This suggest that access to global communications has a big importance for sightings to be reported (or that aliens are not interested in visiting Africa.)
+
+Lets do the same analysis, but only having into account reports from 2008, when Internet is accessible globally:
+
+```{r}
+df$year <- year(df$datetime)
+
+ggplot() +
+  geom_sf(data = world, fill = "white", color = "black", size = 0.2) +
+  geom_point(
+    data = filter(df, year >= 2008), 
+    aes(x = longitude, y = latitude), 
+    color = "green", 
+    alpha = 0.3, 
+    size = 0.5
+  ) +
+  coord_sf() +
+  labs(
+    title = "UFO Sightings Around the World in 2008-2014",
+    x = "Longitude",
+    y = "Latitude"
+  ) +
+  theme_minimal()
+```
+  
+
+Results are very similar. It is curious that crowded countries with an easy access to internet like Argentina or Mexico do not have so many reports. This lead us to think that there is a cultural reason in U.S. that makes people more prone to identify flying objects as UFOs or that, if aliens really exist, they love to visit this country.
+
+<div style="page-break-before: always;"></div>
+
+
+Now we are comparing reports per inhabitant for the countries we have data:
+
+```{r, echo=F, results='hide', warning=F}
+library(wpp2019)
+```
+
+
+```{r}
+data(pop) 
+countries_of_interest <- c("Australia", "Canada", "Germany", "United Kingdom", "United States of America")
+pop_extract <- pop %>% filter(name %in% countries_of_interest) %>% select(name, '2000')
+print(pop_extract)
+
+df_pop <- data.frame(table(filter(df, !is.na(country))$country))
+df_pop %>% mutate(freq_norm = Freq / pop_extract$'2000' * 1e6)  -> df_pop # Normalizing using 2000's populations
+df_pop$freq_norm %>% round -> df_pop$freq_norm
+print(df_pop)
+```
+
+
+```{r}
+ggplot(df_pop, aes(x = "", y = freq_norm, fill = Var1)) +
+  geom_bar(stat = "identity", width = 1, color = "white") +
+  coord_polar("y") +
+  scale_fill_brewer(palette = "Set3") +
+  theme_void() +
+  labs(
+    fill = "Country",
+    title = "UFO Reports per Population (per 1,000,000) in 2000"
+  )
+```
+
+  
+The plot shows that reports per inhabitant is significantly bigger in U.S than other countries. This confirms our previous hypothesis.
+
+
+<div style="page-break-before: always;"></div>
+
+## 3. Temporal analysis. Is there a specific time of year when these events are more common?
+
+We start analyzing the total number of reports through the years:
+
+```{r}
+ggplot(df, aes(x = year)) +
+  geom_bar(fill = "lightblue", color = "black") +
+  labs(title = "UFO Sightings Per Year", x = "Year", y = "Number of Sightings") +
+  scale_x_continuous(
+    breaks = seq(min(df$year, na.rm = TRUE), max(df$year, na.rm = TRUE), by = 5)
+  ) +
+  theme_classic() +  
+  theme(
+    axis.text.x = element_text(angle = 60, hjust = 1)
+  )
+```
+  
+
+We can observe that sightings increases over years and the growth rate also rises. Here are my hypothesis for different periods:  
+
+- (1906 - 1946) The number is very small. Limited technology and communication channels resulted in fewer reported sightings.  
+- (1946 - 1994) Grows slowly. Increased media coverage (e.g., 1947 Roswell incident, sci-fi films) and the Cold War era heightened public interest and awareness.  
+- (1994 - 2014) Grows fast. Widespread internet access, mobile phones, and social media made reporting sightings easier and more accessible, leading to rapid growth. Last year is lower because the data acquisition stopped during the year.  
+
+Looking at sightings hours could give us some important information:
+
+```{r}
+
+df_by_hour <- df %>%
+  mutate(hour = hour(datetime)) %>%       # integer from 0 to 23
+  group_by(hour) %>%
+  summarize(n_reports = n(), .groups = "drop")
+
+ggplot(df_by_hour, aes(x = factor(hour), y = n_reports, fill = hour)) +
+  geom_bar(stat = "identity", color = "black") +
+  scale_fill_gradient2(
+    low = "darkblue",
+    mid = "yellow",
+    high = "darkblue",
+    midpoint = 12,
+    name = "Hour"
+  ) +
+  labs(
+    x = "Hour of Day (0–23)",
+    y = "Number of Reports",
+    title = "UFO Reports by Hour of Day"
+  ) +
+  theme_minimal()
+
+```
+  
+
+It is curious to observe that there are more reports in the hours when people usually have free time (After job and before bed).
+
+```{r}
+df_by_month <- df %>%
+  mutate(
+    month = month(datetime),  # integer 1..12
+    season = case_when(
+      month %in% c(12, 1, 2)  ~ "Winter",
+      month %in% c(3, 4, 5)   ~ "Spring",
+      month %in% c(6, 7, 8)   ~ "Summer",
+      month %in% c(9, 10, 11) ~ "Fall"
+    )
+  ) %>%
+  group_by(month, season) %>%
+  summarize(n_sightings = n(), .groups = "drop")
+
+ggplot(df_by_month, aes(x = factor(month), y = n_sightings, fill = season)) +
+  geom_bar(stat = "identity", color = "black") +
+  scale_fill_manual(
+    values = c(
+      "Winter" = "skyblue",
+      "Spring" = "seagreen",
+      "Summer" = "gold",
+      "Fall"   = "orange"
+    )
+  ) +
+  labs(
+    x = "Month",
+    y = "Number of Reports",
+    fill = "Season (Northern Hemisphere)",
+    title = "UFO Sightings per Month"
+  ) +
+  theme_minimal()
+```
+
+
+The seasons with more reports is summer (Taking into account that data comes mainly from Northern Hemisphere: U.S. and Europe). The hypothesis here is that people are often outdoors, so chances of an event to be reported are higher. Now we know that if we want to look for UFOs, the best time for doing it is on summer over 9pm.
+
+
+<div style="page-break-before: always;"></div>
+
+## 4. Are there recurring patterns in the shapes?
+
+In this case would be interesting to do frequency analysis over *comments* column using packages like *udpipe* to find the most common words appearing in reports descriptions, but unfortunately I do not have the hardware to perform this task. We would analize instead *shapes* column:
+
+
+```{r}
+
+shape_freq <- df %>%
+  filter(!is.na(shape)) %>%    # Remove rows with missing shape
+  group_by(shape) %>%
+  summarize(n = n(), .groups = "drop") %>%
+  arrange(desc(n))             # Sort descending by frequency
+
+ggplot(shape_freq, aes(x = reorder(shape, n), y = n)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  coord_flip() +
+  labs(
+    x = "Shape",
+    y = "Number of Sightings",
+    title = "Frequency of UFO Shapes"
+  ) +
+  theme_minimal()
+
+```
+
+
+```{r}
+top5_shapes <- shape_freq %>%
+  slice_head(n = 5) %>%
+  pull(shape)  
+
+df_yearly_shapes <- df %>%
+  filter(
+    shape %in% top5_shapes,
+    year > 1975,
+    year < 2014
+  ) %>%
+  group_by(shape, year) %>%
+  summarize(n = n(), .groups = "drop")
+
+head(df_yearly_shapes)
+```
+
+
+```{r}
+ggplot(df_yearly_shapes, aes(x = year, y = n, color = shape)) +
+  geom_line() +
+  labs(
+    title = "Top 5 UFO Shapes Over the Years",
+    x = "Year",
+    y = "Number of Reports",
+    color = "Shape"
+  ) +
+  theme_minimal()
+
+```
+  
+  
+Description of the events as *light* has increased over the years, being with difference the most common description in 20th century. In my opinion, the development of aviation has a lot to say about this.
+
+
+## 5. Conclusions.
+
+Our exploratory analysis of the UFO sightings dataset reveals several patterns. First, the frequency of reports has increased over time, although part of this trend likely reflects greater public awareness and reporting mechanisms in more recent years. Geographically, the United States accounts for the largest volume of documented sightings, with other English-speaking countries (such as Canada, the United Kingdom, and Australia) also showing significant activity. When examining shapes, “light,” “triangle,” and “circle” are among the most commonly reported forms, suggesting certain recurring visual perceptions. Additionally, the analysis of sightings throughout the day reveals a peak in reports during the late evening hours, possibly correlating with times people are more likely to be outdoors or actively sky-watching. While these findings provide interesting insights into human observations and reporting behavior, they do not offer direct evidence of extraterrestrial origins; rather, they illustrate social and cultural factors influencing witness accounts, as well as the limitations of anecdotal data.
+
+

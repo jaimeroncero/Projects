@@ -1,0 +1,318 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+
+\section{1. Data Preparation}\label{data-preparation}
+
+\subsection{1.1. Data import}\label{data-import}
+
+Load all the packages we need.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(tidyverse)}
+\FunctionTok{library}\NormalTok{(dplyr)}
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\end{Highlighting}
+\end{Shaded}
+
+Load the dataset.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{rm}\NormalTok{(}\AttributeTok{list=}\FunctionTok{ls}\NormalTok{())}
+\NormalTok{df }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(}\StringTok{"../data/01\_initial\_dataset.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{1.2. Initial exploration.}\label{initial-exploration.}
+
+View data structure.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{head}\NormalTok{(df)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 6 x 11
+##   datetime city  state country shape `duration (seconds)` `duration (hours/min)`
+##   <chr>    <chr> <chr> <chr>   <chr>                <dbl> <chr>                 
+## 1 10/10/1~ san ~ tx    us      cyli~                 2700 45 minutes            
+## 2 10/10/1~ lack~ tx    <NA>    light                 7200 1-2 hrs               
+## 3 10/10/1~ ches~ <NA>  gb      circ~                   20 20 seconds            
+## 4 10/10/1~ edna  tx    us      circ~                   20 1/2 hour              
+## 5 10/10/1~ kane~ hi    us      light                  900 15 minutes            
+## 6 10/10/1~ bris~ tn    us      sphe~                  300 5 minutes             
+## # i 4 more variables: comments <chr>, `date posted` <chr>, latitude <chr>,
+## #   longitude <chr>
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{glimpse}\NormalTok{(df)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Rows: 88,875
+## Columns: 11
+## $ datetime               <chr> "10/10/1949 20:30", "10/10/1949 21:00", "10/10/~
+## $ city                   <chr> "san marcos", "lackland afb", "chester (uk/engl~
+## $ state                  <chr> "tx", "tx", NA, "tx", "hi", "tn", NA, "ct", "al~
+## $ country                <chr> "us", NA, "gb", "us", "us", "us", "gb", "us", "~
+## $ shape                  <chr> "cylinder", "light", "circle", "circle", "light~
+## $ `duration (seconds)`   <dbl> 2700, 7200, 20, 20, 900, 300, 180, 1200, 180, 1~
+## $ `duration (hours/min)` <chr> "45 minutes", "1-2 hrs", "20 seconds", "1/2 hou~
+## $ comments               <chr> "This event took place in early fall around 194~
+## $ `date posted`          <chr> "4/27/2004", "12/16/2005", "1/21/2008", "1/17/2~
+## $ latitude               <chr> "29.8830556", "29.38421", "53.2", "28.9783333",~
+## $ longitude              <chr> "-97.9411111", "-98.581082", "-2.916667", "-96.~
+\end{verbatim}
+
+We see that each row correspond to a different UFO sighting and contains
+11 columns with information about it (country, time,\ldots)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    datetime             city              state             country         
+##  Length:88875       Length:88875       Length:88875       Length:88875      
+##  Class :character   Class :character   Class :character   Class :character  
+##  Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+##                                                                             
+##                                                                             
+##                                                                             
+##                                                                             
+##     shape           duration (seconds) duration (hours/min)   comments        
+##  Length:88875       Min.   :       0   Length:88875         Length:88875      
+##  Class :character   1st Qu.:      15   Class :character     Class :character  
+##  Mode  :character   Median :     120   Mode  :character     Mode  :character  
+##                     Mean   :    8373                                          
+##                     3rd Qu.:     600                                          
+##                     Max.   :97836000                                          
+##                     NA's   :5                                                 
+##  date posted          latitude          longitude        
+##  Length:88875       Length:88875       Length:88875      
+##  Class :character   Class :character   Class :character  
+##  Mode  :character   Mode  :character   Mode  :character  
+##                                                          
+##                                                          
+##                                                          
+## 
+\end{verbatim}
+
+Lets start by transforming columns data types to something more suitable
+for them:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{datetime }\OtherTok{\textless{}{-}} \FunctionTok{as.POSIXct}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{datetime, }\AttributeTok{format =} \StringTok{"\%m/\%d/\%Y \%H:\%M"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{city }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{city)}
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{state }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{state)}
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{country }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{country)}
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{shape }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{shape)}
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{longitude }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{longitude)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: NAs introducidos por coerción
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{latitude }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{latitude)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: NAs introducidos por coerción
+\end{verbatim}
+
+We remove the following columns: * \emph{duration (hours/min)} column
+because it has irrelevant information having \emph{duration (seconds)}
+column and it has inconsistent data format (1/2 hour, 1-2 hours, 20
+seconds). * We remove as well \emph{comments} due to its complex
+manipulation to extract information, \emph{date posted} because contains
+not relevant data for the analysis we will perform. * \emph{date posted}
+because contains not relevant data for the analysis we will perform. *
+\emph{city} because it contains very specific ano.
+
+We remove \emph{duration (hours/min)} column because it has irrelevant
+information having \emph{duration (seconds)} column and it has
+inconsistent data format (1/2 hour, 1-2 hours, 20 seconds). We remove as
+well \emph{comments} due to its complex manipulation to extract
+information, \emph{date posted} because contains not relevant data for
+the analysis we will perform and \emph{city} because it contains very
+specific ano.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{duration (hours/min)}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{comments }\OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{date posted}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+Look at summary statistics to catch any anomalies (e.g., impossible
+durations, negative latitudes for countries that should not have them,
+etc.).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     datetime                               city           state      
+##  Min.   :1906-11-11 00:00:00.00   seattle    :  570   ca     :10450  
+##  1st Qu.:2001-06-04 17:30:00.00   phoenix    :  488   wa     : 4653  
+##  Median :2006-09-21 20:00:00.00   portland   :  399   fl     : 4598  
+##  Mean   :2004-03-04 03:23:10.56   las vegas  :  395   tx     : 4050  
+##  3rd Qu.:2011-05-08 22:30:00.00   los angeles:  375   ny     : 3511  
+##  Max.   :2014-05-08 18:45:00.00   (Other)    :86452   (Other):54094  
+##  NA's   :2                        NA's       :  196   NA's   : 7519  
+##  country           shape       duration (seconds)    latitude     
+##  au  :  593   light   :17872   Min.   :       0   Min.   :-82.86  
+##  ca  : 3266   triangle: 8489   1st Qu.:      15   1st Qu.: 34.03  
+##  de  :  112   circle  : 8453   Median :     120   Median : 39.23  
+##  gb  : 2050   fireball: 6562   Mean   :    8373   Mean   : 37.45  
+##  us  :70293   unknown : 6319   3rd Qu.:     600   3rd Qu.: 42.72  
+##  NA's:12561   (Other) :38062   Max.   :97836000   Max.   : 72.70  
+##               NA's    : 3118   NA's   :5          NA's   :197     
+##    longitude      
+##  Min.   :-176.66  
+##  1st Qu.:-112.07  
+##  Median : -87.65  
+##  Mean   : -85.02  
+##  3rd Qu.: -77.77  
+##  Max.   : 178.44  
+##  NA's   :196
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  aasdas
+\item
+  adasda
+\item
+  asdasd
+\end{enumerate}
+
+\end{document}
